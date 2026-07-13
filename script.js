@@ -38,22 +38,66 @@
     let startTimestamp = null;
     let isIntroFinished = false;
 
+    let audioCtx = null;
+
+    function getAudioCtx() {
+        if (!audioCtx) {
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            if (!AudioCtx) return null;
+            audioCtx = new AudioCtx();
+        }
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+        return audioCtx;
+    }
+
     function playClickSound() {
         try {
-            const AudioCtx = window.AudioContext || window.webkitAudioContext;
-            if (!AudioCtx) return;
-            const audioCtx = new AudioCtx();
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
+            const ctx = getAudioCtx();
+            if (!ctx) return;
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
             osc.connect(gain);
-            gain.connect(audioCtx.destination);
+            gain.connect(ctx.destination);
             osc.type = 'sine';
-            osc.frequency.setValueAtTime(600, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(1000, audioCtx.currentTime + 0.08);
-            gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
+            osc.frequency.setValueAtTime(600, ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(1000, ctx.currentTime + 0.08);
+            gain.gain.setValueAtTime(0.05, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
             osc.start();
-            osc.stop(audioCtx.currentTime + 0.1);
+            osc.stop(ctx.currentTime + 0.1);
+        } catch (e) { }
+    }
+
+    function playHeartbeatThump(strength) {
+        try {
+            const ctx = getAudioCtx();
+            if (!ctx) return;
+            const now = ctx.currentTime;
+
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            const filter = ctx.createBiquadFilter();
+            filter.type = 'lowpass';
+            filter.frequency.value = 220;
+
+            osc.type = 'sine';
+            const baseFreq = 85 * strength + 35;
+            osc.frequency.setValueAtTime(baseFreq, now);
+            osc.frequency.exponentialRampToValueAtTime(baseFreq * 0.55, now + 0.16);
+
+            const peakGain = 0.32 * strength;
+            gain.gain.setValueAtTime(0.0001, now);
+            gain.gain.exponentialRampToValueAtTime(peakGain, now + 0.015);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.24);
+
+            osc.connect(filter);
+            filter.connect(gain);
+            gain.connect(ctx.destination);
+
+            osc.start(now);
+            osc.stop(now + 0.26);
         } catch (e) { }
     }
 
@@ -95,6 +139,7 @@
     setTimeout(startCardLoader, 400);
 
     document.getElementById('startBtn').addEventListener('click', () => {
+        getAudioCtx();
         playClickSound();
         document.getElementById('startOverlay').classList.add('fade-out');
         setTimeout(() => {
@@ -105,7 +150,7 @@
 
     let isLetterOpen = false;
     let isLetterTyping = false;
-    const letterText = "Dear A,\n\nI coded this heartbeat for you...\n\nEvery line of code, every pixel, and every beat is a reminder of how much you mean to me.\n\nNo matter where life takes us, my heart will always run in an infinite loop for you, beating forever 💗.";
+    const letterText = "Dear Sophia,\n\nI coded this heartbeat for you...\n\nEvery line of code, every pixel, and every beat is a reminder of how much you mean to me.\n\nNo matter where life takes us, my heart will always run in an infinite loop for you, beating forever 💗.";
 
     function openLetter() {
         if (isLetterOpen) return;
@@ -375,6 +420,9 @@
     const ASSEMBLE_DURATION = 2200;
 
     let beatIntensity = 0;
+    let currentBeatCycleIndex = -1;
+    let beat1SoundPlayed = false;
+    let beat2SoundPlayed = false;
 
     let isDragging = false;
     let startX = 0;
@@ -490,12 +538,31 @@
                 beatIntensity = Math.max(0, beatIntensity - 0.04);
             }
 
-            const triggerTolerance = 16;
-            if (Math.abs(cycleProgress - 70) < triggerTolerance && sparkles.length < 25) {
-                triggerBeatExplosion();
+            const beatCycleIndex = Math.floor((elapsed - (RAIN_DURATION + ASSEMBLE_DURATION)) / beatCycle);
+            if (beatCycleIndex !== currentBeatCycleIndex) {
+                currentBeatCycleIndex = beatCycleIndex;
+                beat1SoundPlayed = false;
+                beat2SoundPlayed = false;
             }
-            if (Math.abs(cycleProgress - 335) < triggerTolerance && sparkles.length < 25) {
-                triggerBeatExplosion();
+
+            const triggerTolerance = 16;
+            if (Math.abs(cycleProgress - 70) < triggerTolerance) {
+                if (!beat1SoundPlayed) {
+                    beat1SoundPlayed = true;
+                    playHeartbeatThump(1.0);
+                }
+                if (sparkles.length < 25) {
+                    triggerBeatExplosion();
+                }
+            }
+            if (Math.abs(cycleProgress - 335) < triggerTolerance) {
+                if (!beat2SoundPlayed) {
+                    beat2SoundPlayed = true;
+                    playHeartbeatThump(0.65);
+                }
+                if (sparkles.length < 25) {
+                    triggerBeatExplosion();
+                }
             }
         }
 
