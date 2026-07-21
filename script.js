@@ -38,6 +38,30 @@
     let startTimestamp = null;
     let isIntroFinished = false;
 
+    // ---- Theme (light/dark) handling ----
+    // The `data-theme` attribute is already set on <html> by the inline
+    // script in <head> (reads the OS/browser `prefers-color-scheme`). Here
+    // we mirror that into a JS flag so the canvas drawing code (stars,
+    // vignette) can pick matching colors, and keep it in sync live if the
+    // person switches their system theme while the page is open.
+    let isLightTheme = document.documentElement.getAttribute('data-theme') === 'light';
+
+    function applyTheme(theme) {
+        isLightTheme = theme === 'light';
+        document.documentElement.setAttribute('data-theme', theme);
+    }
+
+    const themeMediaQuery = window.matchMedia('(prefers-color-scheme: light)');
+    const handleSystemThemeChange = (e) => {
+        applyTheme(e.matches ? 'light' : 'dark');
+    };
+    if (themeMediaQuery.addEventListener) {
+        themeMediaQuery.addEventListener('change', handleSystemThemeChange);
+    } else if (themeMediaQuery.addListener) {
+        // Safari < 14 fallback
+        themeMediaQuery.addListener(handleSystemThemeChange);
+    }
+
     let audioCtx = null;
 
     function getAudioCtx() {
@@ -394,8 +418,10 @@
         }
 
         draw(time) {
-            const alpha = this.baseAlpha + Math.sin(time * this.speed + this.offset) * 0.08;
-            ctx.fillStyle = `rgba(255, 255, 255, ${Math.max(0.02, alpha)})`;
+            const alpha = Math.max(0.02, this.baseAlpha + Math.sin(time * this.speed + this.offset) * 0.08);
+            ctx.fillStyle = isLightTheme
+                ? `rgba(210, 80, 120, ${alpha * 0.5})`
+                : `rgba(255, 255, 255, ${alpha})`;
             ctx.beginPath();
             ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
             ctx.fill();
@@ -656,8 +682,13 @@
         });
 
         const vignetteGlow = ctx.createRadialGradient(CX, CY, Math.min(W, H) * 0.3, CX, CY, Math.max(W, H) * 0.8);
-        vignetteGlow.addColorStop(0, 'rgba(2, 0, 5, 0)');
-        vignetteGlow.addColorStop(1, 'rgba(2, 0, 5, 0.7)');
+        if (isLightTheme) {
+            vignetteGlow.addColorStop(0, 'rgba(255, 243, 246, 0)');
+            vignetteGlow.addColorStop(1, 'rgba(255, 225, 233, 0.55)');
+        } else {
+            vignetteGlow.addColorStop(0, 'rgba(2, 0, 5, 0)');
+            vignetteGlow.addColorStop(1, 'rgba(2, 0, 5, 0.7)');
+        }
         ctx.fillStyle = vignetteGlow;
         ctx.fillRect(0, 0, W, H);
 

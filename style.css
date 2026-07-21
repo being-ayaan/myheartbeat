@@ -6,15 +6,84 @@
     box-sizing: border-box;
 }
 
+:root,
+:root[data-theme="dark"] {
+    --bg: #020005;
+    --vignette-fade: #020005;
+    --text: #fff;
+    --text-secondary: rgba(255, 255, 255, 0.6);
+    --text-muted: rgba(255, 255, 255, 0.4);
+    --text-dim: rgba(255, 255, 255, 0.3);
+    --card-bg: rgba(22, 8, 14, 0.55);
+    --card-border: rgba(255, 45, 85, 0.18);
+    --card-shadow: 0 25px 60px rgba(0, 0, 0, 0.6), 0 0 40px rgba(255, 30, 80, 0.08);
+    --overlay-bg: rgba(2, 0, 5, 0.96);
+    --loading-track: rgba(255, 255, 255, 0.06);
+    --status-color: #b5a2b0;
+    --letter-overlay-bg: rgba(2, 0, 5, 0.7);
+    --letter-bg: rgba(20, 10, 25, 0.85);
+    --letter-border: rgba(255, 45, 85, 0.25);
+    --letter-shadow: 0 25px 50px rgba(0, 0, 0, 0.9), 0 0 30px rgba(255, 45, 85, 0.1);
+    --letter-body-color: rgba(255, 255, 255, 0.85);
+    --divider: rgba(255, 255, 255, 0.05);
+}
+
+:root[data-theme="light"] {
+    --bg: #fff3f6;
+    --vignette-fade: #fff3f6;
+    --text: #2b1420;
+    --text-secondary: rgba(43, 20, 32, 0.65);
+    --text-muted: rgba(43, 20, 32, 0.45);
+    --text-dim: rgba(43, 20, 32, 0.35);
+    --card-bg: rgba(255, 255, 255, 0.6);
+    --card-border: rgba(255, 45, 85, 0.25);
+    --card-shadow: 0 25px 60px rgba(210, 60, 100, 0.18), 0 0 40px rgba(255, 30, 80, 0.08);
+    --overlay-bg: rgba(255, 243, 246, 0.96);
+    --loading-track: rgba(43, 20, 32, 0.08);
+    --status-color: #a1596e;
+    --letter-overlay-bg: rgba(255, 243, 246, 0.75);
+    --letter-bg: rgba(255, 255, 255, 0.85);
+    --letter-border: rgba(255, 45, 85, 0.3);
+    --letter-shadow: 0 25px 50px rgba(210, 60, 100, 0.22), 0 0 30px rgba(255, 45, 85, 0.12);
+    --letter-body-color: rgba(43, 20, 32, 0.85);
+    --divider: rgba(43, 20, 32, 0.08);
+}
+
+/* Fallback for browsers/edge-cases where the inline head script didn't run
+   (e.g. JS disabled) - still respects the OS/browser preference. */
+@media (prefers-color-scheme: light) {
+    :root:not([data-theme]) {
+        --bg: #fff3f6;
+        --vignette-fade: #fff3f6;
+        --text: #2b1420;
+        --text-secondary: rgba(43, 20, 32, 0.65);
+        --text-muted: rgba(43, 20, 32, 0.45);
+        --text-dim: rgba(43, 20, 32, 0.35);
+        --card-bg: rgba(255, 255, 255, 0.6);
+        --card-border: rgba(255, 45, 85, 0.25);
+        --card-shadow: 0 25px 60px rgba(210, 60, 100, 0.18), 0 0 40px rgba(255, 30, 80, 0.08);
+        --overlay-bg: rgba(255, 243, 246, 0.96);
+        --loading-track: rgba(43, 20, 32, 0.08);
+        --status-color: #a1596e;
+        --letter-overlay-bg: rgba(255, 243, 246, 0.75);
+        --letter-bg: rgba(255, 255, 255, 0.85);
+        --letter-border: rgba(255, 45, 85, 0.3);
+        --letter-shadow: 0 25px 50px rgba(210, 60, 100, 0.22), 0 0 30px rgba(255, 45, 85, 0.12);
+        --letter-body-color: rgba(43, 20, 32, 0.85);
+        --divider: rgba(43, 20, 32, 0.08);
+    }
+}
+
 html, body {
     width: 100%;
     height: 100%;
     overflow: hidden;
-    background: #020005;
+    background: var(--bg);
     font-family: 'Plus Jakarta Sans', sans-serif;
-    color: #fff;
+    color: var(--text);
     user-select: none;
     -webkit-font-smoothing: antialiased;
+    transition: background-color 0.4s ease, color 0.4s ease;
 }
 
 #c {
@@ -65,7 +134,7 @@ html, body {
     font-size: 15px;
     font-weight: 300;
     letter-spacing: 4px;
-    color: rgba(255, 255, 255, 0.6);
+    color: var(--text-secondary);
     text-transform: uppercase;
     margin-bottom: 6px;
     opacity: 0;
@@ -77,7 +146,7 @@ html, body {
     font-family: 'Dancing Script', cursive;
     font-size: 36px;
     font-weight: 700;
-    color: #fff;
+    color: var(--text);
     opacity: 0;
     transform: translateY(15px);
     transition: opacity 0.8s ease 0.3s, transform 0.8s ease 0.3s;
@@ -126,7 +195,7 @@ html, body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(2, 0, 5, 0.96);
+    background: var(--overlay-bg);
     z-index: 200;
     display: flex;
     align-items: center;
@@ -134,7 +203,7 @@ html, body {
     padding: 20px;
     opacity: 1;
     visibility: visible;
-    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.8s;
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.8s, background-color 0.4s ease;
 }
 
 .start-overlay.fade-out {
@@ -150,19 +219,17 @@ html, body {
 .glass-card {
     position: relative;
     width: min(85vw, 340px);
-    background: rgba(22, 8, 14, 0.55);
-    border: 1px solid rgba(255, 45, 85, 0.18);
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
     border-radius: 24px;
     padding: 35px 24px;
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
-    box-shadow:
-        0 25px 60px rgba(0, 0, 0, 0.6),
-        0 0 40px rgba(255, 30, 80, 0.08);
+    box-shadow: var(--card-shadow);
     transform: scale(1);
-    transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.4s ease, box-shadow 0.4s ease;
     overflow: hidden;
 }
 
@@ -191,7 +258,7 @@ html, body {
 }
 
 .card-title {
-    color: #fff;
+    color: var(--text);
     font-family: 'Fira Code', monospace;
     font-size: 22px;
     font-weight: 500;
@@ -203,7 +270,7 @@ html, body {
 .loading-bar-container {
     width: 100%;
     height: 6px;
-    background: rgba(255, 255, 255, 0.06);
+    background: var(--loading-track);
     border-radius: 3px;
     overflow: hidden;
     margin-bottom: 10px;
@@ -219,7 +286,7 @@ html, body {
 
 .status-text {
     font-size: 12px;
-    color: #b5a2b0;
+    color: var(--status-color);
     font-family: 'Fira Code', monospace;
     margin-bottom: 26px;
 }
@@ -244,8 +311,8 @@ html, body {
 }
 
 .start-btn:disabled {
-    background: rgba(255, 255, 255, 0.08);
-    color: rgba(255, 255, 255, 0.3);
+    background: var(--loading-track);
+    color: var(--text-dim);
     cursor: not-allowed;
     box-shadow: none;
     transform: none !important;
@@ -293,7 +360,7 @@ html, body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(2, 0, 5, 0.7);
+    background: var(--letter-overlay-bg);
     z-index: 150;
     display: flex;
     align-items: center;
@@ -301,7 +368,7 @@ html, body {
     padding: 20px;
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.5s ease, visibility 0.5s;
+    transition: opacity 0.5s ease, visibility 0.5s, background-color 0.4s ease;
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
 }
@@ -314,13 +381,13 @@ html, body {
 .letter-card {
     position: relative;
     width: min(90vw, 360px);
-    background: rgba(20, 10, 25, 0.85);
-    border: 1px solid rgba(255, 45, 85, 0.25);
+    background: var(--letter-bg);
+    border: 1px solid var(--letter-border);
     border-radius: 20px;
     padding: 35px 28px 30px;
-    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.9), 0 0 30px rgba(255, 45, 85, 0.1);
+    box-shadow: var(--letter-shadow);
     transform: translateY(20px) scale(0.95);
-    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.4s ease, box-shadow 0.4s ease;
     text-align: left;
 }
 
@@ -334,7 +401,7 @@ html, body {
     right: 20px;
     background: none;
     border: none;
-    color: rgba(255, 255, 255, 0.4);
+    color: var(--text-muted);
     font-size: 28px;
     cursor: pointer;
     line-height: 1;
@@ -353,7 +420,7 @@ html, body {
     letter-spacing: 2px;
     color: #ff2d55;
     margin-bottom: 20px;
-    border-bottom: 1px solid rgba(255, 45, 85, 0.15);
+    border-bottom: 1px solid var(--divider);
     padding-bottom: 8px;
 }
 
@@ -361,7 +428,7 @@ html, body {
     font-family: 'Plus Jakarta Sans', sans-serif;
     font-size: 14px;
     line-height: 1.7;
-    color: rgba(255, 255, 255, 0.85);
+    color: var(--letter-body-color);
     min-height: 100px;
     margin-bottom: 24px;
     white-space: pre-line;
@@ -370,8 +437,8 @@ html, body {
 .letter-sign {
     font-family: 'Fira Code', monospace;
     font-size: 11px;
-    color: rgba(255, 255, 255, 0.4);
+    color: var(--text-muted);
     text-align: right;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    border-top: 1px solid var(--divider);
     padding-top: 12px;
 }

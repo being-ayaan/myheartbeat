@@ -4,7 +4,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="color-scheme" content="light dark">
     <title>For You</title>
+    <script>
+        (function () {
+            try {
+                var theme = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+                document.documentElement.setAttribute('data-theme', theme);
+            } catch (e) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+        })();
+    </script>
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -39,7 +50,7 @@
 
 
     <div class="msg" id="msg">
-        <p class="m2">for <span>you</span> 💗</p>
+        <p class="m2">for <span>you</span></p>
     </div>
 
     <script src="script.js"></script>
